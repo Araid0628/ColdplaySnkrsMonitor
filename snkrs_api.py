@@ -137,16 +137,17 @@ def requestSneaker(order, offset):
 
 
 def timer():
-    print("监控开始")
+    print("Monitoring...")
     while True:
         try:
             http = urllib3.PoolManager()
-            requestURL = url + OrderBy.updated.value + "offset=0"
+            requestURL = url + OrderBy.updated.value + "&offset=0"
             r = http.request("GET", requestURL)
             jsonData = json.loads(r.data)
             datas = jsonData["threads"]
         except:
-            time.sleep(60)
+            print("Sleep...")
+            time.sleep(10)
             timer()
         for data in datas:
             sneakerid = data["id"]
