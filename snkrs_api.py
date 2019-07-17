@@ -5,30 +5,10 @@ import urllib3
 from enum import Enum
 
 requests.packages.urllib3.disable_warnings()
-# import discord
-from skimage import io
 # cn = "&country=CN&language=zh-Hans"
 # us = "&country=US&language=en"
 # jp = "&country=JP&language=ja"
 # https://api.nike.com/snkrs/content/v1/?country=CN&language=zh-Hans&offset=0&orderBy=published
-
-# url = "https://api.nike.com/snkrs/content/v1/?country=CN&language=zh-Hans&offset=0&orderBy=published"
-# r = json.loads(requests.get(url).text)
-# for item in r["threads"]:
-#     product = item["product"]
-#     engineDict = {
-#         "LEO": "LEO(2分钟抽签)",
-#         "DAN": "DAN(15分钟抽签)",
-#     }
-#     try:
-#         engine = product["selectionEngine"]
-#         status = product["merchStatus"]
-#         if "pass" in item["name"]:
-#             print("款式: {productName}, 发售时间: {startSellDate}, 发售机制：{selectionEngine}".format(
-#                 productName=product["title"], startSellDate=product["startSellDate"],
-#                 selectionEngine=engineDict[engine]))
-#     except:
-#         pass
 sneakers = []
 ludict = {}
 class OrderBy(Enum):
@@ -69,6 +49,7 @@ def printSneakerDetail(jsonData):
     }
     product = jsonData["product"]
     productInfo = ""
+    imageURL = jsonData["imageUrl"]
     try:
         productInfo += product["title"]
         if jsonData["restricted"]:
@@ -81,7 +62,7 @@ def printSneakerDetail(jsonData):
         productInfo = publicType + launchInfo
     except:
         pass
-    return productInfo
+    return productInfo, imageURL
 
 
 def requestSneakerNoOffset(order):
@@ -157,8 +138,8 @@ def timer():
                 sneakers.append(sneakerid)
                 ludict[data["id"]] = getTime(t_last_update_date)
                 # await message.channel.send('Hello!')
-                printSneakerDetail(data)
-                print("发现新款")
+                detail, imgUrl = printSneakerDetail(data)
+                print("发现新款", detail, imgUrl)
         time.sleep(5)
 
 
