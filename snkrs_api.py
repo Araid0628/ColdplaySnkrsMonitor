@@ -64,7 +64,8 @@ def printSneaker(jsonData):
 def printSneakerDetail(jsonData):
     selectionEngineDict = {
         "LEO": "LEO(2分钟抽签)",
-        "DAN": "DAN(15/30分钟抽签)"
+        "DAN": "DAN(15/30分钟抽签)",
+        "FLOW": "先到先得"
     }
     product = jsonData["product"]
     productInfo = ""
@@ -135,13 +136,13 @@ def requestSneaker(order, offset):
 #     sneakers.extend(snkrs)
 
 
-
 def timer():
-    print("Monitoring...")
     while True:
         try:
+            print("Monitoring...")
             http = urllib3.PoolManager()
-            requestURL = url + OrderBy.updated.value + "&offset=0"
+            # requestURL = url + OrderBy.updated.value + "&offset=0"
+            requestURL = url + OrderBy.published.value + "&offset=0"
             r = http.request("GET", requestURL)
             jsonData = json.loads(r.data)
             datas = jsonData["threads"]
@@ -151,18 +152,18 @@ def timer():
             timer()
         for data in datas:
             sneakerid = data["id"]
-            t_last_update_date = data["lastUpdateDate"]
+            t_last_update_date = data["lastUpdatedDate"]
             if sneakerid not in sneakers:
                 sneakers.append(sneakerid)
                 ludict[data["id"]] = getTime(t_last_update_date)
                 # await message.channel.send('Hello!')
                 printSneakerDetail(data)
-        time.sleep(3)
+                print("发现新款")
+        time.sleep(5)
 
 
-if __name__ == '__main__':
-    snkrs = requestSneakerNoOffset(OrderBy.published.value)
-    if len(snkrs) == 0:
-        print("数据请求完毕")
-    sneakers.extend(snkrs)
-    timer()
+snkrs = requestSneakerNoOffset(OrderBy.published.value)
+if len(snkrs) == 0:
+    print("数据请求完毕")
+sneakers.extend(snkrs)
+timer()
